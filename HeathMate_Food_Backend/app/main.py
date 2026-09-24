@@ -27,6 +27,17 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+APP_NAME = "HeathMate Food API"
+MAX_IMAGE_BASE64_CHARS = 3_000_000
+MAX_RESPONSE_FOODS = 6
+USDA_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
+
+AI_TIMEOUT = httpx.Timeout(
+    connect=15.0,
+    read=80.0,
+    write=30.0,
+    pool=15.0,
+)
 _firebase_ready = False
 _firebase_error: str | None = None
 
@@ -219,7 +230,7 @@ async def analyze_with_gemini(image_base64: str, mime: str) -> list[dict[str, An
     }
 
     try:
-        async with httpx.AsyncClient(timeout=40.0) as client:
+         async with httpx.AsyncClient(timeout=AI_TIMEOUT) as client:
             response = await client.post(
                 url,
                 headers={"x-goog-api-key": api_key, "Content-Type": "application/json"},
@@ -274,7 +285,7 @@ async def analyze_with_openai_compatible(image_base64: str, mime: str) -> list[d
     }
 
     try:
-        async with httpx.AsyncClient(timeout=40.0) as client:
+        async with httpx.AsyncClient(timeout=AI_TIMEOUT) as client:
             response = await client.post(
                 f"{base_url}/v1/chat/completions",
                 headers={
@@ -481,3 +492,4 @@ async def log_http_exception(request: Request, exc: HTTPException):
         status_code=exc.status_code,
         content={"detail": exc.detail},
     )
+    
