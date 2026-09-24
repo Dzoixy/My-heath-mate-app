@@ -460,3 +460,24 @@ async def foods(
 ) -> dict[str, Any]:
     result = await search_usda(request.query)
     return {"foods": result}
+
+import logging
+from fastapi import Request
+from fastapi.responses import JSONResponse
+
+logger = logging.getLogger("uvicorn.error")
+
+@app.exception_handler(HTTPException)
+async def log_http_exception(request: Request, exc: HTTPException):
+    logger.error(
+        "%s %s -> HTTP %s: %s",
+        request.method,
+        request.url.path,
+        exc.status_code,
+        exc.detail,
+    )
+
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
