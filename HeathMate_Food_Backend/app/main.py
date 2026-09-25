@@ -34,9 +34,9 @@ USDA_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 
 AI_TIMEOUT = httpx.Timeout(
     connect=15.0,
-    read=80.0,
-    write=30.0,
-    pool=15.0,
+    read=120.0,
+    write=45.0,
+    pool=20.0,
 )
 _firebase_ready = False
 _firebase_error: str | None = None
